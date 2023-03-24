@@ -54,7 +54,7 @@ body {font-family: Arial;}
 <!--Section for Care and Treatment dashboard-->
 <div id="careandtreatment" class="tabcontent" style="display:block">
 
-    ${ ui.includeFragment("ugandaemrreports", "careTreatment") }
+    ${ ui.includeFragment("ugandaemrreports", "care") }
 
 </div>
 
@@ -75,9 +75,10 @@ body {font-family: Arial;}
 <!--Weekly Surge dashboard-->
 <div id="weeklysurge" class="tabcontent">
 
-    ${ ui.includeFragment("ugandaemrreports", "weeklySurge") }
+    ${ ui.includeFragment("ugandaemrreports", "surge") }
 
 </div>
+
 
 <!--Scripts Section-->
 <script>

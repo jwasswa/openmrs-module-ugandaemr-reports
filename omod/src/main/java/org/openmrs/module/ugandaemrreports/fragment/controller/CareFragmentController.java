@@ -3,36 +3,24 @@ package org.openmrs.module.ugandaemrreports.fragment.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Encounter;
-import org.openmrs.Obs;
-import org.openmrs.Patient;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.EncounterService;
-import org.openmrs.api.ObsService;
 import org.openmrs.api.PatientService;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.reporting.cohort.definition.CohortDefinition;
-import org.openmrs.module.reporting.cohort.definition.service.CohortDefinitionService;
 import org.openmrs.module.reporting.evaluation.EvaluationContext;
-import org.openmrs.module.reporting.evaluation.EvaluationException;
 import org.openmrs.module.reporting.evaluation.querybuilder.HqlQueryBuilder;
 import org.openmrs.module.ugandaemrreports.library.HIVCohortDefinitionLibrary;
 import org.openmrs.ui.framework.annotation.SpringBean;
 import org.openmrs.ui.framework.fragment.FragmentModel;
-import org.openmrs.ui.framework.page.PageModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
-import org.openmrs.Cohort;
 
-public class CareTreatmentFragmentController {
+public class CareFragmentController {
 
 
     protected final Log log = LogFactory.getLog(getClass());
@@ -79,7 +67,7 @@ public class CareTreatmentFragmentController {
         q.where(String.format("encounter_type =(select et.encounter_type_id from encounter_type et where et.uuid='%s') and encounter_datetime between '%s' and '%s'", "8d5b27bc-c2cc-11de-8d13-0010c6dffd0f", startDate, endDate));
         q.groupBy("month(encounter_datetime)");
 
-        log.error(q.toString() + " Query to return enrollments");
+        log.info(q.toString() + " Query to return enrollments");
 
         List<List<Object>> monthly_enrollments_in_period = administrationService.executeSQL(q.toString(), true);
         log.info(monthly_enrollments_in_period.size() + "=============== Size of records returned============");
@@ -94,12 +82,12 @@ public class CareTreatmentFragmentController {
         q.from(Encounter.class);
         q.where(String.format("encounter_type =(select et.encounter_type_id from encounter_type et where et.uuid='8d5b27bc-c2cc-11de-8d13-0010c6dffd0f') and encounter_datetime between '%s' and '%s'", startDate, endDate));
 
-        log.error(q.toString() + " Query to return total enrollments in a certain period");
+        log.info(q.toString() + " Query to return total enrollments in a certain period");
 
         List<List<Object>> t_enrolled = administrationService.executeSQL(q.toString(), true);
 
         model.addAttribute("total_enrolled_in_a_period", t_enrolled.get(0).get(0));
-        log.error("===========:" + t_enrolled.get(0).get(0) + ":total_enrolled_in_a_period==============");
+        log.info("===========:" + t_enrolled.get(0).get(0) + ":total_enrolled_in_a_period==============");
 
 
         //Count all patient available and add to a model attribute(B)
@@ -109,7 +97,7 @@ public class CareTreatmentFragmentController {
             //total_patients_system = patientService.getAllPatients().stream().filter(c -> c.getDead() != true).count();
             total_patients_system = patientService.getAllPatients().size();
             model.addAttribute("total_patients_system", total_patients_system);
-            log.error("===========:" + total_patients_system + ":total_patients_system==============");
+            log.info("===========:" + total_patients_system + ":total_patients_system==============");
 
         } else {
             log.info("===========:getting records from database total_patients_system_database==============");
@@ -124,7 +112,7 @@ public class CareTreatmentFragmentController {
             */
             //q.where(String.format("add where close to eliminate deceased and lost to follow up"));
 
-            log.error(q.toString() + " getting records from database total_patients_system");
+            log.info(q.toString() + " getting records from database total_patients_system");
 
             List<List<Object>> t_enrolled_in_system = administrationService.executeSQL(q.toString(), true);
 
@@ -140,13 +128,13 @@ public class CareTreatmentFragmentController {
         q.from(Encounter.class);
         q.where(String.format("encounter_type =(select et.encounter_type_id from encounter_type et where et.uuid='8d5b27bc-c2cc-11de-8d13-0010c6dffd0f')"));
 
-        log.error(q.toString() + " Query to return total enrollments in a care");
+        log.info(q.toString() + " Query to return total enrollments in a care");
 
         List<List<Object>> t_enrolled_in_care = administrationService.executeSQL(q.toString(), true);
 
         long total_enrolled_in_a_care = (long) t_enrolled_in_care.get(0).get(0);
         model.addAttribute("total_enrolled_in_a_care", total_enrolled_in_a_care);
-        log.error("===========:" + total_enrolled_in_a_care + ":total_enrolled_in_a_care==============");
+        log.info("===========:" + total_enrolled_in_a_care + ":total_enrolled_in_a_care==============");
 
 
         //Not Active in Care
@@ -161,13 +149,13 @@ public class CareTreatmentFragmentController {
         q = new HqlQueryBuilder();
         q.select(String.format("count(*) as 'tx_new_new_on_art' from (select max(value_datetime) from %s where concept_id=%s and value_datetime between '%s' and '%s'  group by person_id) tx_new_new_on_art", "obs", 99161, startDate, endDate));
 
-        log.error(q.toString() + " New on ART in a specified period");
+        log.info(q.toString() + " New on ART in a specified period");
 
         List<List<Object>> tx_new_new_on_art = administrationService.executeSQL(q.toString(), true);
 
         long tx_new_new_on_art1 = (long) tx_new_new_on_art.get(0).get(0);
         model.addAttribute("tx_new_new_on_art_period", tx_new_new_on_art1);
-        log.error("===========:" + tx_new_new_on_art1 + ":tx_new_new_on_art1==============");
+        log.info("===========:" + tx_new_new_on_art1 + ":tx_new_new_on_art1==============");
 
         //viral load chart
         //concept ids to use 163023 to get the date breed and 856 for the number of copies comapre the with obs_datetime
@@ -176,7 +164,7 @@ public class CareTreatmentFragmentController {
         q = new HqlQueryBuilder();
         q.select(String.format("count(*) from (select distinct(person_id),max(value_datetime) as 'date_bread' from %s where concept_id=%s and value_datetime >='%s'  group by person_id) bt", "obs", 163023, getVlReportingPeriod(administrationService)));
 
-        log.error(q.toString() + " Clients with Vl");
+        log.info(q.toString() + " Clients with Vl");
 
         List<List<Object>> tt_clients_with_vl = administrationService.executeSQL(q.toString(), true);
         model.addAttribute("tt_clients_with_vl_in_period", tt_clients_with_vl.get(0).get(0));
@@ -187,7 +175,7 @@ public class CareTreatmentFragmentController {
         q.select(String.format("distinct(person_id),value_numeric,max(obs_datetime) from %s", "obs"));
         q.where(String.format("concept_id=%s and obs_datetime >='%s'", 856, getVlReportingPeriod(administrationService)));
         q.groupBy("person_id");
-        log.error(q.toString() + " suppressed and non suppressed");
+        log.info(q.toString() + " suppressed and non suppressed");
 
         List<List<Object>> tt_supplessed_and_non_supplessed = administrationService.executeSQL(q.toString(), true);
 
